@@ -140,6 +140,7 @@ class PagosController extends Controller{
                 ]);
 
 
+
                 $laQrImage = "data:image/png;base64," . json_decode($laValues)->qrImage;
                 echo $laQrImage ;
 

@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
-use App\Models\Curso;
-use App\Models\Video;
+use App\Models\Guia;
 use App\Models\Venta;
 use App\Models\Pago;
 use App\Models\DetalleVenta;
-use App\Models\Progreso;
+
 
 class CallBackAdminController extends Controller{
 
@@ -35,18 +34,6 @@ class CallBackAdminController extends Controller{
         $venta->update();
 
 
-        $detalleVenta = DetalleVenta::where('venta_id', $venta->id)->first(['curso_id']);
-        $existingProgreso = Progreso::where('user_id', $venta->user_id)
-                                     ->where('curso_id',$detalleVenta->curso_id)
-                                     ->exists();
-
-                                     if(!$existingProgreso){
-                                        $progreso = Progreso::create([
-                                            'user_id' => $venta->user_id,
-                                            'curso_id' => $detalleVenta->curso_id,
-                                            'porcentaprogreso' => 0,
-                                        ]);
-                                    }
 
         try {
             $arreglo = ['error' => 0, 'status' => 1, 'message' => "Pago realizado correctamente.", 'values' => true];

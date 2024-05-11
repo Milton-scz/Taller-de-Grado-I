@@ -8,9 +8,11 @@ use App\Models\Almacen;
 use App\Models\Servicio;
 use App\Models\Pago;
 use App\Models\Venta;
-
+use App\Models\Vertice;
+use App\Models\Ruta;
+use App\Models\Arco;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Hash;
 class GuiaController extends Controller
 {
     public function index(){
@@ -23,7 +25,10 @@ class GuiaController extends Controller
         $users  = User::all();
         $servicios  = Servicio::all();
         $almacenes  = Almacen::all();
-        return view('GestionarGuias.guias.create')->with("users", $users)->with("paquetes", $paquetes)->with("servicios", $servicios)->with("almacenes", $almacenes);
+        $vertices  = Vertice::all();
+        $arcos  = Arco::all();
+        return view('GestionarGuias.guias.create')->with("users", $users)->with("paquetes", $paquetes)
+        ->with("servicios", $servicios)->with("almacenes", $almacenes)->with("vertices", $vertices)->with("arcos", $arcos);
     }
 
     public function store(Request $request) {
@@ -53,6 +58,8 @@ class GuiaController extends Controller
         $paquete->delete();
         return Redirect::route('admin.paquetes');
     }
+
+
 
 
 }

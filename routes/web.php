@@ -9,10 +9,12 @@ use App\Http\Controllers\GuiaController;
 use App\Http\Controllers\PaqueteController;
 use App\Http\Controllers\AlmacenController;
 use App\Http\Controllers\ServicioController;
+use App\Http\Controllers\VentasController;
 use App\Http\Controllers\RutaRastreoController;
 use App\Http\Controllers\PagosController;
 use App\Http\Controllers\CallBackAdminController;
 use App\Http\Controllers\ConsultarAdminController;
+use App\Http\Controllers\RutasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,6 +81,7 @@ Route::middleware('auth')->group(function () {
          Route::patch('/admin-guia/update/{guia_id}', [GuiaController::class, 'update'])->name('admin.guia.update');
          Route::delete('admin-guia/destroy/{guia_id}',  [GuiaController::class, 'destroy'])->name('admin.guia.destroy');
 
+
          //GESTIONAR RUTA_RASTREO
          Route::get('/admin-rutasrastreos',[RutaRastreoController::class, 'index'])->name('admin.rutasrastreos');
          Route::get('/admin-rutarastreo/create',[RutaRastreoController::class, 'create'])->name('admin.rutarastreo.create');
@@ -86,6 +89,30 @@ Route::middleware('auth')->group(function () {
          Route::get('/admin-rutarastreo/edit/{rutarastreo_id}',[RutaRastreoController::class, 'edit'])->name('admin.rutarastreo.edit');
          Route::patch('/admin-rutarastreo/update/{rutarastreo_id}', [RutaRastreoController::class, 'update'])->name('admin.rutarastreo.update');
          Route::delete('admin-rutarastreo/destroy/{rutarastreo_id}',  [RutaRastreoController::class, 'destroy'])->name('admin.rutarastreo.destroy');
+
+
+          //GESTIONAR VENTAS
+          Route::get('/admin-ventas',[VentasController::class, 'index'])->name('admin.ventas');
+          Route::get('/admin-ventas/create',[VentasController::class, 'create'])->name('admin.ventas.create');
+          Route::post('/admin-ventas/store',[VentasController::class, 'store'])->name('admin.ventas.store');
+          Route::get('/admin-ventas/edit/{venta_id}',[VentasController::class, 'edit'])->name('admin.ventas.edit');
+          Route::patch('/admin-ventas/update/{venta_id}', [VentasController::class, 'update'])->name('admin.ventas.update');
+          Route::delete('admin-ventas/destroy/{venta_id}',  [VentasController::class, 'destroy'])->name('admin.ventas.destroy');
+
+            //GESTIONAR GRAFO
+            Route::get('/admin-rutas',[RutasController::class, 'index'])->name('admin.rutas');
+            Route::get('/admin-ruta/create',[RutasController::class, 'create'])->name('admin.ruta.create');
+            Route::post('/admin-ruta/store',[RutasController::class, 'store'])->name('admin.ruta.store');
+            Route::post('/admin-ruta-vertice/store',[RutasController::class, 'verticestore'])->name('admin.ruta.verticestore');
+
+            Route::post('/admin-ruta-arco/store',[RutasController::class, 'arcostore'])->name('admin.ruta.arcostore');
+            Route::get('/admin-ruta/show/{ruta_id}',[RutasController::class, 'show'])->name('admin.ruta.show');
+            Route::get('/admin-ruta/edit/{ruta_id}',[RutasController::class, 'edit'])->name('admin.ruta.edit');
+            Route::patch('/admin-ruta/update/{ruta_id}', [RutasController::class, 'update'])->name('admin.ruta.update');
+            Route::delete('admin-ruta/destroy/{ruta_id}',  [RutasController::class, 'destroy'])->name('admin.ruta.destroy');
+
+
+
 
             // PAGOS WEB
 

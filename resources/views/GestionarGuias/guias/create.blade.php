@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>Obologistic</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -38,7 +40,7 @@
 
             <!-- Formulario -->
             <div class="bg-white shadow-md rounded-md p-6 mt-4">
-                <form method="POST" action="{{ route('admin.pagos.generarCobro') }}" >
+                <form method="POST"  id="formPrincipal" action="{{ route('admin.pagos.generarCobro') }}" >
                     @csrf
                     <!-- Paso 1: Registrar Cliente -->
                     <fieldset>
@@ -106,16 +108,45 @@
                             </div>
                         </div>
 
-                        <div class="mt-4">
-                        <x-input-label for="almacen_id" :value="__('Seleccionar Ruta')" />
+                <!-- primer vertice -->
+                                       <!-- Formulario de selección de vértices -->
+
+                           <!-- primer vertice -->
+                           <div class="mt-4">
+                                            <x-input-label for="almacen_salida" :value="__('Almacen Salida')" />
+                                                <div class="mt-4">
+                                                <select id="verticeOrigenId" name="verticeOrigenId" class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                    @foreach($vertices as $vertice)
+                                                        <option value="{{$vertice->id}}">{{$vertice->nombre}}</option>
+                                                    @endforeach
+                                                </select>
+                                                </div>
+                                        </div>
+                <!-- final primer vertice -->
+
+                <!-- segundo vertice -->
+                             <div class="mt-4">
+                                 <x-input-label for="almacen_llegada" :value="__('Almacen Llegada')" />
+                                    <div class="mt-4">
+                                            <select id="verticeDestinoId" name="verticeDestinoId" class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                                @foreach($vertices as $vertice)
+                                                    <option value="{{$vertice->id}}">{{$vertice->nombre}}</option>
+                                                @endforeach
+                                            </select>
+                                    </div>
+                              </div>
+                     <!-- final degundo vertice -->
+                            <!-- Agrega este elemento ul donde mostrarás el resultado del camino más corto -->
                             <div class="mt-4">
-                                <select id="almacen_id" name="dto_almacen_id[]" class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" multiple>
-                                    @foreach($almacenes as $almacen)
-                                        <option value="{{$almacen->id}}">{{$almacen->nombre}}</option>
-                                    @endforeach
-                                </select>
+                                <x-input-label for="caminoMasCorto" :value="__('Camino más corto')" />
+                                <div class="mt-4">
+                                    <ul id="listaCaminoMasCorto" class="list-disc pl-5">
+                                        <!-- Aquí se mostrarán los vértices del camino más corto como elementos de lista -->
+                                    </ul>
+                                </div>
                             </div>
-                             </div>
+
+                <!-- final degundo vertice -->
 
                         <button type="button" name="previous"
                             class="previous bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
@@ -167,7 +198,7 @@
                                 <!-- nomnto total  -->
                                 <div class="flex flex-col">
                                 <x-input-label for="name" :value="__('Monto Total')" />
-                                <x-text-input type="number"  required name="tnMonto" :value="0.01" class="border p-2 rounded-md"  readonly/>
+                                <x-text-input type="number"  required name="taPedidoDetalle[0][tn_total]" :value="0.01" class="border p-2 rounded-md"  readonly/>
                                 </div>
                                 <!-- nomnto total  -->
 
@@ -222,6 +253,194 @@
         </div>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+                $(document).ready(function() {
+                    const intervalID = setInterval(function() {
+                        const xhr = new XMLHttpRequest();
+                        xhr.onreadystatechange = function() {
+                            if (xhr.readyState === XMLHttpRequest.DONE) {
+                                if (xhr.status === 200) {
+                                    const response = xhr.responseText;
+                                    if (response.trim() === "COMPLETADO-PROCESADO") {
+                                        clearInterval(intervalID);
+                                        showModal("Su pedido fue pagado con éxito!!!!");
+
+                                    }
+                                }
+                            }
+                        };
+
+                        // Reemplaza nroTransaccion con el valor correcto
+                        const route = ' . json_encode(route('admin.pagos.consultar', ['venta_id' => $nroTransaccion])) . ';
+                        xhr.open("GET", route, true);
+                        xhr.send();
+                    }, 10000);
+
+                    function showModal(mensaje) {
+                        const modalUserName = document.getElementById("mensaje");
+                        if (modalUserName) {
+                            modalUserName.textContent = mensaje;
+                            const modal = document.getElementById(\'userModal\');
+                            if (modal) {
+                                modal.classList.remove(\'hidden\');
+                            }
+                        } else {
+                            console.error(\'El elemento con ID "mensaje" no fue encontrado en el DOM\');
+                        }
+                    }
+
+                    const btn = document.getElementById("closeModal");
+                    if(btn){
+                       document.getElementById("closeModal").addEventListener("click", function() {
+                        const modal = document.getElementById("userModal");
+                        modal.classList.add("hidden");
+                       });
+                     }
+                });
+
+            </script>
+<script>
+    class Grafo {
+        constructor() {
+            this.vertices = {};
+        }
+
+        agregarVertice(id) {
+            if (!this.vertices[id]) {
+                this.vertices[id] = {};
+            }
+        }
+
+        agregarArco(origen, destino, costo) {
+            if (!this.vertices[origen] || !this.vertices[destino]) {
+                throw new Error('El vértice origen o destino no existe en el grafo.');
+            }
+            if (!this.vertices[origen].hasOwnProperty(destino) || this.vertices[origen][destino] > costo) {
+                this.vertices[origen][destino] = costo;
+            }
+        }
+
+        dijkstra(origen, destino) {
+            if (!this.vertices.hasOwnProperty(destino)) {
+                console.log(`El vértice ${destino} no existe en el grafo.`);
+                return [];
+            }
+
+            const distancias = {};
+            const anteriores = {};
+            const noVisitados = {};
+
+            for (let vertice in this.vertices) {
+                distancias[vertice] = Infinity;
+                anteriores[vertice] = null;
+                noVisitados[vertice] = this.vertices[vertice];
+            }
+
+            distancias[origen] = 0;
+
+            while (Object.keys(noVisitados).length > 0) {
+                const verticeActual = this.minDistanciaVertice(distancias, noVisitados);
+                if (verticeActual === destino || distancias[verticeActual] === Infinity) {
+                    break;
+                }
+
+                delete noVisitados[verticeActual];
+
+                for (let vecino in this.vertices[verticeActual]) {
+                    const costo = this.vertices[verticeActual][vecino];
+                    const distanciaNueva = distancias[verticeActual] + costo;
+
+                    if (distanciaNueva < distancias[vecino]) {
+                        distancias[vecino] = distanciaNueva;
+                        anteriores[vecino] = verticeActual;
+                    }
+                }
+            }
+
+            return this.construirCamino(origen, destino, anteriores);
+        }
+
+        minDistanciaVertice(distancias, noVisitados) {
+            let minDistancia = Infinity;
+            let minVertice = null;
+
+            for (let vertice in noVisitados) {
+                if (distancias[vertice] < minDistancia) {
+                    minDistancia = distancias[vertice];
+                    minVertice = vertice;
+                }
+            }
+
+            return minVertice;
+        }
+
+        construirCamino(origen, destino, anteriores) {
+            const camino = [];
+            let verticeActual = destino;
+
+            while (verticeActual !== null) {
+                camino.unshift(verticeActual);
+                verticeActual = anteriores[verticeActual];
+            }
+
+            if (camino[0] === origen) {
+                return camino;
+            } else {
+               return []; // No se encontró un camino desde el origen al destino
+            }
+        }
+    }
+
+    // Obtener los vértices y arcos desde Laravel
+    var vertices = @json($vertices);
+    var arcos = @json($arcos);
+
+    // Crear una instancia del grafo
+    const grafo = new Grafo();
+
+    // Agregar vértices al grafo
+    vertices.forEach(vertice => {
+        grafo.agregarVertice(vertice.id); // Suponiendo que 'id' es el identificador del vértice
+    });
+
+    // Agregar arcos al grafo
+    arcos.forEach(arco => {
+        grafo.agregarArco(arco.vertice_origen_id, arco.vertice_destino_id, arco.peso);
+    });
+
+      // Función para actualizar la lista con el camino más corto
+      function actualizarCaminoMasCorto(camino) {
+        const listaCaminoMasCorto = document.getElementById('listaCaminoMasCorto');
+        listaCaminoMasCorto.innerHTML = ''; // Limpiar el contenido anterior
+
+        camino.forEach(vertice => {
+            const li = document.createElement('li');
+            li.textContent = vertice;
+            listaCaminoMasCorto.appendChild(li);
+        });
+    }
+
+    // Ejecutar Dijkstra al seleccionar el destino
+    $('#verticeDestinoId').on('change', function() {
+        var verticeOrigenId = $('#verticeOrigenId').val();
+        var verticeDestinoId = $(this).val();
+
+        // Ejecutar Dijkstra con los nuevos vértices de origen y destino
+        const caminoMasCorto = grafo.dijkstra(verticeOrigenId, verticeDestinoId);
+        console.log('Camino más corto:', caminoMasCorto.join(' -> '));
+        actualizarCaminoMasCorto(caminoMasCorto);
+    });
+
+    // Ejecutar Dijkstra al cargar el DOM
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('Grafo creado:', grafo);
+    });
+</script>
+
+
+
+
 <script>
     $(document).ready(function() {
         $('form').submit(function(e) {
