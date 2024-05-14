@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+
     <title>Obologistic</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -40,7 +41,7 @@
 
             <!-- Formulario -->
             <div class="bg-white shadow-md rounded-md p-6 mt-4">
-                <form method="POST"  id="formPrincipal" action="{{ route('admin.pagos.generarCobro') }}" >
+                <form method="POST"  action="{{ route('admin.pagos.generarCobro') }}" >
                     @csrf
                     <!-- Paso 1: Registrar Cliente -->
                     <fieldset>
@@ -57,7 +58,7 @@
                         </div>
                         <div class="mb-4">
                             <label for="cedula" class="block text-sm font-medium text-gray-700">Cedula</label>
-                            <input type="text" id="cedula" name="dto_cedula" placeholder="Cedula de identidad"
+                            <input type="number" id="cedula" name="dto_cedula" placeholder="Cedula de identidad"
                                 class="mt-1 p-2 w-full border rounded-md">
                         </div>
                         <div class="mb-4">
@@ -66,6 +67,22 @@
                                 class="mt-1 p-2 w-full border rounded-md">
                         </div>
 
+                        <div class="mb-4">
+                            <label for="direccion" class="block text-sm font-medium text-gray-700">Direccion</label>
+                            <input type="text" id="direccion" name="direccion" placeholder="Direccion"
+                                class="mt-1 p-2 w-full border rounded-md">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="correo" class="block text-sm font-medium text-gray-700">E-mail</label>
+                            <input type="text" id="correo" name="correo" placeholder="Correo Electronico"
+                                class="mt-1 p-2 w-full border rounded-md">
+                        </div>
+                        <div class="mb-4">
+                            <label for="celular" class="block text-sm font-medium text-gray-700">Celular</label>
+                            <input type="number" id="celular" name="celular" placeholder="Celular"
+                                class="mt-1 p-2 w-full border rounded-md">
+                        </div>
 
                         <button type="button" name="next"
                             class="next bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
@@ -100,12 +117,16 @@
                         <div class="mt-4">
                             <x-input-label for="servicio_id" :value="__('Seleccionar Servicio')" />
                             <div class="mt-4">
-                                <select id="servicio_id" name="dto_servicio_id" class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                <select id="servicio_id" name="dto_servicio_id" onchange="actualizarPrecio()" class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                     @foreach($servicios as $servicio)
-                                    <option value="{{$servicio->id}}"> {{$servicio->nombre}} </option>
+                                    <option value="{{$servicio->id}}" data-atributo="{{$servicio->precio_kilo}}">{{$servicio->nombre}}</option>
                                     @endforeach
                                 </select>
                             </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="montoTotal" class="block text-sm font-medium text-gray-700">Monto Total a Pagar</label>
+                            <input type="number" id="monto_total" name="monto_total"   class="mt-1 p-2 w-full border rounded-md">
                         </div>
 
                 <!-- primer vertice -->
@@ -152,154 +173,138 @@
                             class="previous bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                             Previo
                         </button>
-                        <button type="button" name="next"
-                            class="next bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Siguiente
-                        </button>
-                    </fieldset>
-
-                    <!-- Paso 3: Pagos Qr -->
-                    <fieldset class="hidden">
-                        <h2 class="text-xl font-semibold mb-4">Paso 3: Realiza el Pago por Qr</h2>
-                        <!-- DESDE AQUI PARA EL PAGO QR-->
-
-                        <div class="mx-auto max-w-8xl sm:px-6 lg:py-20" >
-                  <div class="flex justify-center">
-                       <div class="w-full md:w-1/2 text-center">
-                         <h3 class="text-3xl font-bold">PagoFacil QR y Tigo Money</h3>
-                         <div class="bg-white shadow-md rounded-md p-6 mt-4">
-                        <h5 class="text-center mb-4 text-lg font-semibold">Datos para la factura</h5>
-
-                        <form method="POST" action="{{ route('admin.pagos.generarCobro') }}" >
-                            @csrf
-                            <x-text-input type="hidden" name="tcUserId" :value="auth()->id()" />
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="flex flex-col">
-                                    <label class="px-3">Razon Social</label>
-                                    <x-text-input type="text" required name="tcRazonSocial" :value="__('Gupo03-SA')" class="border p-2 rounded-md " readonly/>
-                                </div>
-                                <div class="flex flex-col">
-                                    <label class="px-3">CI/NIT</label>
-                                    <input type="text" required name="tcCiNit" placeholder="Número de CI/NIT" class="border p-2 rounded-md">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="flex flex-col">
-                                    <label class="px-3">Celular</label>
-                                    <input type="text" required name="tnTelefono" placeholder="Número de Teléfono" class="border p-2 rounded-md">
-                                </div>
-                                <div class="flex flex-col">
-                                    <label class="px-3">Correo</label>
-                                    <x-text-input type="text" required name="tcCorreo" :value="__('juan@gmail.com')" class="border p-2 rounded-md" readonly/>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                                <!-- nomnto total  -->
-                                <div class="flex flex-col">
-                                <x-input-label for="name" :value="__('Monto Total')" />
-                                <x-text-input type="number"  required name="taPedidoDetalle[0][tn_total]" :value="0.01" class="border p-2 rounded-md"  readonly/>
-                                </div>
-                                <!-- nomnto total  -->
-
-                                <!-- tipo de servicio  -->
-                                <div class="flex flex-col">
-                                    <label class="px-3">Tipo de Servicio</label>
-                                    <select name="tnTipoServicio" class="border p-2 rounded-md">
-                                        <option value="1">Servicio QR</option>
-                                        <option value="2">Tigo Money</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <h5 class="text-center mt-4  font-semibold">Datos del Producto</h5>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-
-                            </div>
-
-                            <div class="flex justify-center mt-4">
-                                    <div class="w-full md:w-1/2">
-                                    <x-primary-button class="ms-4">
-                                      {{ __('Pagar') }}
-                                         </x-primary-button>
-                                    </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                  <!-- segunda columna-->
-                  <div class="w-full md:w-1/2 text-center">
-                  <div class="flex justify-center">
-                           <iframe name="QrImage" style="width: 100%; height: 495px;"></iframe>
-                    </div>
-                    </div>
-
-             <!-- segunda columna-->
-                </div>
-                            <!-- HASTA AQUI PARA EL PAGO QR  -->
-
-                        <button type="button" name="previous"
-                            class="previous bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                            Previo
-                        </button>
-                        <button type="submit" name="submit"
-                            class="submit bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                            id="submit_data">
+                        <button type="button" id="btnCapturar"
+                            class="submit bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                             Enviar
                         </button>
-                    </fieldset>
+
                 </form>
+                <div class="flex justify-center">
+                                     <div class="flex justify-center mt-4">
+                                            <div class="flex justify-center">
+                                                <div id="userModal" class="hidden fixed inset-0 bg-blue-500 bg-opacity-75 flex justify-center items-center">
+                                                    <div class="bg-white p-8 rounded shadow-lg  justify-center items-center">
+                                                        <p id="mensaje" class="text-xl font-bold mb-4"></p>
+                                                        <div class="flex justify-center mt-4">
+                                                        <form method="GET"  action="{{ route('admin.guias') }}" >
+                                                              @csrf
+                                                          <x-primary-button id="closeModal" class="mt-4">
+                                                            {{ __('Cerrar') }}
+                                                            </x-primary-button>
+                                                          </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                      </div>
+                                 </div>
             </div>
         </div>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-                $(document).ready(function() {
-                    const intervalID = setInterval(function() {
-                        const xhr = new XMLHttpRequest();
-                        xhr.onreadystatechange = function() {
-                            if (xhr.readyState === XMLHttpRequest.DONE) {
-                                if (xhr.status === 200) {
-                                    const response = xhr.responseText;
-                                    if (response.trim() === "COMPLETADO-PROCESADO") {
-                                        clearInterval(intervalID);
-                                        showModal("Su pedido fue pagado con éxito!!!!");
+$(document).ready(function() {
+    const btnCapturar = $('#btnCapturar');
 
-                                    }
-                                }
-                            }
-                        };
+    if (btnCapturar.length) {
+        btnCapturar.click(function() {
+            const nombre = $('#name').val();
+            const apellido = $('#apellido').val();
+            const fecha_nacimiento = $('#fecha_nacimiento').val();
+            const cedula = $('#cedula').val();
+            const celular = $('#celular').val();
+            const direccion = $('#direccion').val();
+            const correo = $('#correo').val();
+            const dimensiones = $('#dimensiones').val();
+            const peso = $('#peso').val();
+            const fecha_salida = $('#fecha_salida').val();
+            const fecha_llegada = $('#fecha_llegada').val();
+            const servicio_id = $('#servicio_id').val();
+            const verticeOrigenId = $('#verticeOrigenId').val();
+            const verticeDestinoId = $('#verticeDestinoId').val();
+            const monto_total = $('#monto_total').val();
 
-                        // Reemplaza nroTransaccion con el valor correcto
-                        const route = ' . json_encode(route('admin.pagos.consultar', ['venta_id' => $nroTransaccion])) . ';
-                        xhr.open("GET", route, true);
-                        xhr.send();
-                    }, 10000);
+            const listaCaminoMasCorto = $('#listaCaminoMasCorto');
+            const valoresLista = listaCaminoMasCorto.find('li').map(function() {
+                return $(this).attr('value'); // Obtener el valor del atributo 'value' del elemento <li>
+            }).get();
 
-                    function showModal(mensaje) {
-                        const modalUserName = document.getElementById("mensaje");
-                        if (modalUserName) {
-                            modalUserName.textContent = mensaje;
-                            const modal = document.getElementById(\'userModal\');
-                            if (modal) {
-                                modal.classList.remove(\'hidden\');
-                            }
-                        } else {
-                            console.error(\'El elemento con ID "mensaje" no fue encontrado en el DOM\');
-                        }
+            const datos = {
+                nombre,
+                apellido,
+                fecha_nacimiento,
+                cedula,
+                celular,
+                direccion,
+                correo,
+                dimensiones,
+                peso,
+                fecha_salida,
+                fecha_llegada,
+                servicio_id,
+                verticeOrigenId,
+                verticeDestinoId,
+                monto_total,
+                valoresLista
+            };
+            const token = $('meta[name="csrf-token"]').attr('content');
+            datos._token = token;
+            console.log(datos);
+
+            $.ajax({
+                url: '/admin-guia/store',
+                type: 'POST',
+                data: datos,
+                headers: {
+                    'X-CSRF-TOKEN': token
+                },
+                success: function(response, status, xhr) {
+                    console.log(xhr.status);
+                    if (xhr.status === 200) {
+                        // Mostrar el modal
+                        $('#userModal').removeClass('hidden'); // Remover la clase 'hidden' para mostrar el modal
+                        $('#mensaje').text(response.message); // Mostrar el mensaje en el modal
                     }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+    } else {
+        console.error('No se encontró el botón btnCapturar.');
+    }
+});
 
-                    const btn = document.getElementById("closeModal");
-                    if(btn){
-                       document.getElementById("closeModal").addEventListener("click", function() {
-                        const modal = document.getElementById("userModal");
-                        modal.classList.add("hidden");
-                       });
-                     }
-                });
+</script>
+<script>
+    function actualizarPrecio() {
+        // Obtener el valor seleccionado del campo de servicio
+        const servicioSelect = document.getElementById('servicio_id');
+        const selectedServiceOption = servicioSelect.options[servicioSelect.selectedIndex];
 
-            </script>
+        // Obtener el precio por kilo del servicio seleccionado desde el atributo data-atributo
+        const precioKilo = parseFloat(selectedServiceOption.getAttribute('data-atributo'));
+
+        // Verificar si el precio por kilo es un número válido
+        if (!isNaN(precioKilo)) {
+            // Obtener el valor del campo de peso
+            const peso = parseFloat(document.getElementById('peso').value);
+
+            // Calcular el monto total
+            const montoTotal = peso * precioKilo;
+
+            // Actualizar el valor del campo monto_total
+            document.getElementById('monto_total').value = montoTotal.toFixed(2); // Mostrar el resultado con 2 decimales
+        } else {
+            console.error('Precio por kilo no válido.');
+        }
+    }
+</script>
+
+<script>
+    var vertices = @json($vertices);
+</script>
 <script>
     class Grafo {
         constructor() {
@@ -409,15 +414,27 @@
         grafo.agregarArco(arco.vertice_origen_id, arco.vertice_destino_id, arco.peso);
     });
 
-      // Función para actualizar la lista con el camino más corto
-      function actualizarCaminoMasCorto(camino) {
+     // Función para actualizar la lista con el camino más corto
+    function actualizarCaminoMasCorto(camino) {
         const listaCaminoMasCorto = document.getElementById('listaCaminoMasCorto');
         listaCaminoMasCorto.innerHTML = ''; // Limpiar el contenido anterior
 
-        camino.forEach(vertice => {
-            const li = document.createElement('li');
-            li.textContent = vertice;
-            listaCaminoMasCorto.appendChild(li);
+        camino.forEach(verticeId => {
+            // Buscar el vértice con el ID correspondiente en el array de vértices
+            const verticeEncontrado = vertices.find(vertice => vertice.id == verticeId);
+
+            // Verificar si se encontró el vértice
+            if (verticeEncontrado) {
+                // Crear un elemento <li> con atributo value y texto personalizados
+                const li = document.createElement('li');
+                li.setAttribute('value', verticeEncontrado.id); // Establecer el atributo value
+                li.textContent = verticeEncontrado.nombre; // Establecer el contenido de texto
+
+                // Agregar el elemento <li> a la lista
+                listaCaminoMasCorto.appendChild(li);
+            }else {
+                console.error(`No se encontró un vértice con ID ${verticeId}`);
+            }
         });
     }
 
@@ -432,6 +449,7 @@
         actualizarCaminoMasCorto(caminoMasCorto);
     });
 
+
     // Ejecutar Dijkstra al cargar el DOM
     document.addEventListener('DOMContentLoaded', () => {
         console.log('Grafo creado:', grafo);
@@ -441,35 +459,7 @@
 
 
 
-<script>
-    $(document).ready(function() {
-        $('form').submit(function(e) {
-            e.preventDefault(); // Evita el envío del formulario normal
 
-            // Obtiene los datos del formulario
-            var formData = $(this).serialize();
-
-            // Realiza la solicitud AJAX
-            $.ajax({
-                type: 'POST',
-                url: $(this).attr('action'),
-                data: formData,
-                success: function(response) {
-                    console.log('Éxito:', response);
-                    var qrCodeUrl = response; // Reemplaza 'qrCodeUrl' con el nombre de tu campo de respuesta que contiene la URL del código QR
-                    // Actualiza el src del iframe con la URL del código QR
-                    $('iframe[name="QrImage"]').attr('src', qrCodeUrl);
-                },
-                error: function(error) {
-                    console.error('Error:', error);
-                    // Manejo de errores en caso de falla de la solicitud
-                }
-            });
-        });
-    });
-
-
-</script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {

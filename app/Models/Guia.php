@@ -18,9 +18,19 @@ class Guia extends Model
         return $this->belongsTo(Paquete::class);
     }
 
+    public function almacenSalida()
+    {
+        return $this->belongsTo(Almacen::class, 'almacen_salida');
+    }
+
+    public function almacenLlegada()
+    {
+        return $this->belongsTo(Almacen::class, 'almacen_llegada');
+    }
+
     public function servicio()
     {
-        return $this->hasOne(Servicio::class);
+        return $this->belongsTo(Servicio::class);
     }
 
     public function ruta_rastreo(){

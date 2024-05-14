@@ -27,7 +27,7 @@
 
                 <!-- Formulario para agregar vértices -->
                 <div class="bg-white shadow-md rounded-md p-6 mt-4">
-                    <h5 class="text-center mb-4 text-lg font-semibold">Agregar Vértice</h5>
+                    <h5 class="text-center mb-4 text-lg font-semibold">Agregar almacen (Vértice)</h5>
 
                     <form id="formAgregarVertice" method="POST" action="{{ route('admin.ruta.verticestore') }}">
                         @csrf
@@ -36,8 +36,13 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- Campo Vertice -->
                             <div class="flex flex-col">
-                                <label for="nombre" class="px-3">Vertice</label>
+                                <label for="nombre" class="px-3">almacen (Vertice)</label>
                                 <input type="text" id="nombre" name="nombre" required placeholder="Introducir vértice"
+                                    class="border p-2 rounded-md">
+                            </div>
+                            <div class="flex flex-col">
+                                <label for="direccion" class="px-3">Direccion del Almacen</label>
+                                <input type="text" id="direccion" name="direccion" required placeholder="Introducir direccion"
                                     class="border p-2 rounded-md">
                             </div>
 
@@ -69,7 +74,7 @@
 
                             <!-- Select para Vertice Origen -->
                             <div class="flex flex-col">
-                                <label for="vertice_origen_id" class="px-3">Vértice Origen</label>
+                                <label for="vertice_origen_id" class="px-3">Almacen de Origen (Vertice de Origen)</label>
                                 <select id="vertice_origen_id" name="vertice_origen_id"
                                     class="border p-2 rounded-md">
                                     @foreach($ruta->vertices as $vertice)
@@ -80,7 +85,7 @@
 
                             <!-- Select para Vertice Llegada -->
                             <div class="flex flex-col">
-                                <label for="vertice_destino_id" class="px-3">Vértice Destino</label>
+                                <label for="vertice_destino_id" class="px-3">Almacen de Destino (Vertice de Destino)</label>
                                 <select id="vertice_destino_id" name="vertice_destino_id"
                                     class="border p-2 rounded-md">
                                     @foreach($ruta->vertices as $vertice)
@@ -105,53 +110,31 @@
 
     <script>
         $(document).ready(function () {
-            // Manejar la submisión del formulario para agregar vértices
             $('#formAgregarVertice').submit(function (e) {
-                e.preventDefault(); // Prevenir el envío normal del formulario
-
-                var formData = $(this).serialize(); // Obtener los datos del formulario
-
-                // Realizar una petición AJAX para agregar el vértice
+                e.preventDefault();
+                var formData = $(this).serialize();
                 $.post($(this).attr('action'), formData, function (response) {
                     console.log('Vértice agregado:', response);
-
-                   // Limpiar y volver a cargar el select con los vértices actualizados
                    var selectOrigen = $('select[name="vertice_origen_id"]');
                     var selectDestino = $('select[name="vertice_destino_id"]');
-
-                    // Limpiar selectores existentes
                     selectOrigen.empty();
                     selectDestino.empty();
-
-                    // Agregar opciones actualizadas a los selectores
                     $.each(response.vertices, function(index, vertice) {
                         selectOrigen.append($('<option></option>').attr('value', vertice.id).text(vertice.nombre));
                         selectDestino.append($('<option></option>').attr('value', vertice.id).text(vertice.nombre));
                     });
-
-                    // Opcional: seleccionar la última opción agregada por defecto
                     selectOrigen.val(response.last_inserted_id);
                     selectDestino.val(response.last_inserted_id);
-
-                    // Informar al usuario que se ha agregado el vértice
-                  //  alert('Vértice agregado correctamente');
-
-                    // Limpiar el campo de nombre del vértice
+                    alert('Vértice agregado correctamente');
                     $('#nombre').val('');
+                    $('#direccion').val('');
                 });
             });
-
-            // Manejar la submisión del formulario para agregar arcos
             $('#formAgregarArco').submit(function (e) {
-                e.preventDefault(); // Prevenir el envío normal del formulario
-
-                var formData = $(this).serialize(); // Obtener los datos del formulario
-
-                // Realizar una petición AJAX para agregar el arco
+                e.preventDefault();
+                var formData = $(this).serialize();
                 $.post($(this).attr('action'), formData, function (response) {
                     console.log('Arco agregado:', response);
-
-                    // Aquí puedes realizar otras acciones después de agregar el arco
                 });
             });
         });

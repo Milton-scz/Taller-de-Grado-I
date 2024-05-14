@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Ruta;
 use App\Models\Arco;
 use App\Models\Vertice;
+use App\Models\Almacen;
 use Illuminate\Support\Facades\Redirect;
 class RutasController extends Controller
 {
@@ -65,6 +66,11 @@ class RutasController extends Controller
         $vertice->nombre = $validatedData['nombre'];
         $vertice->ruta_id = $validatedData['ruta_id'];
         $vertice->save();
+
+        $almacen = new Almacen();
+        $almacen->nombre = $validatedData['nombre'];
+        $almacen->direccion =$request->direccion;
+        $almacen->save();
 
         // Obtener los vértices actualizados para la ruta
     $ruta = Ruta::find($validatedData['ruta_id']);

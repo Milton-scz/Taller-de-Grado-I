@@ -74,7 +74,7 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button  :active="request()->routeIs('admin.ventas')" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
+                        <button  :active="request()->routeIs('admin.almacenes')" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
                             <div>{{ __('Gestionar Ventas') }}</div>
 
                             <div class="ms-1">
@@ -85,7 +85,7 @@
                         </button>
                     </x-slot>
                     <x-slot name="content">
-                    <x-nav-link :href="route('admin.ventas')" :active="request()->routeIs('admin.ventas')">
+                    <x-nav-link :href="route('admin.almacenes')" :active="request()->routeIs('admin.almacenes')">
                         {{ __('Ventas') }}
                     </x-nav-link>
                     </x-slot>

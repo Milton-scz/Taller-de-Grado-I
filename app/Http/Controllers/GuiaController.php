@@ -11,8 +11,10 @@ use App\Models\Venta;
 use App\Models\Vertice;
 use App\Models\Ruta;
 use App\Models\Arco;
+use App\Models\Ruta_Rastreo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 class GuiaController extends Controller
 {
     public function index(){
@@ -30,22 +32,103 @@ class GuiaController extends Controller
         return view('GestionarGuias.guias.create')->with("users", $users)->with("paquetes", $paquetes)
         ->with("servicios", $servicios)->with("almacenes", $almacenes)->with("vertices", $vertices)->with("arcos", $arcos);
     }
+    public function generarCodigoUnico($longitud = 10)
+    {
+        $caracteresPermitidos = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $codigo = '';
 
+        do {
+            $codigo = '';
+            for ($i = 0; $i < $longitud; $i++) {
+                $codigo .= $caracteresPermitidos[rand(0, strlen($caracteresPermitidos) - 1)];
+            }
+            $existeCodigo = Guia::where('codigo', $codigo)->exists();
+        } while ($existeCodigo);
+
+        return $codigo;
+    }
     public function store(Request $request) {
+        $codigo = $this->generarCodigoUnico(20);
+        try {
+        $nombre = $request->input('nombre'); // Ejemplo de cómo acceder a otro campo enviado desde JavaScript
+        $apellido = $request->input('apellido');
+        $cedula = $request->input('cedula');
+        $celular = $request->input('celular');
+        $fecha_nacimiento = $request->input('fecha_nacimiento');
+        $direccion = $request->input('direccion');
+        $correo = $request->input('correo');
+        $dimensiones = $request->input('dimensiones');
+        $peso = $request->input('peso');
+        $fecha_salida = $request->input('fecha_salida');
+        $fecha_llegada = $request->input('fecha_llegada');
+        $servicio_id = $request->input('servicio_id');
+        $verticeOrigeniId = $request->input('verticeOrigenId');
+        $verticeDestinoiId = $request->input('verticeDestinoId');
+        $monto_total = $request->input('monto_total');
+        $valoresLista = $request->input('valoresLista');
 
-        $paquete = Paquete::create([
-            'dimensiones' => $request->dimensiones,
-            'peso' => $request->peso,
+        $user = User::create([
+            'name' => $nombre,
+            'cedula' => $cedula,
+            'celular' => $celular,
+            'direccion' => $direccion,
+            'email' => $correo,
+            'password' => Hash::make("12313123"),
+            'is_admin' => 0,
         ]);
 
-        return Redirect::route('admin.paquete.create');
+        $userUpdate = User::findOrFail($user->id);
+        $userUpdate->cedula = $cedula;
+        $userUpdate->celular = $celular;
+        $userUpdate->direccion = $direccion;
+        $userUpdate->save();
+
+        // Crear un nuevo registro de Paquete con los datos recibidos
+        $paquete = Paquete::create([
+            'dimensiones' => $dimensiones,
+            'peso' => $peso,
+        ]);
+
+        $userId = $user->id;
+        $paqueteId = $paquete->id;
+        $guia = Guia::create([
+            'user_id' => $userId,
+            'paquete_id' => $paqueteId,
+            'servicio_id' => $servicio_id,
+            'almacen_salida' => $verticeOrigeniId,
+            'almacen_llegada' => $verticeDestinoiId,
+            'fecha_salida' => $fecha_salida,
+            'fecha_llegada' => $fecha_llegada,
+            'peso_total' => $peso,
+            'precio_total' => $monto_total,
+            'codigo' => $codigo,
+            'estado' => 0,
+        ]);
+
+        $guiaId = $guia->id;
+        foreach ($valoresLista as $valores) {
+            $rutaRastreo = Ruta_Rastreo::create([
+                'guia_id' => $guiaId,
+                'almacen_id' => $valores,
+                'fecha_registro' => now(),
+                'estado' => 0 ,
+            ]);
+        }
+
+        return response()->json(['message' => 'Datos guardados correctamente'], 200);
+    } catch (\Exception $e) {
+        // Registrar el error en los registros de Laravel
+        \Log::error('Error al procesar la solicitud: ' . $e->getMessage());
+
+        return response()->json(['error' => 'Error interno del servidor'], 500);
+    }
     }
 
     public function update(Request $request, $id){
         $paquete = Paquete::findOrFail($id);
         $paquete->fill($request->all());
         $paquete->save();
-        return Redirect::route('admin.paquetes');
+        return Redirect::route('admin.guias');
     }
 
     public function edit($paquete_id){

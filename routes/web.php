@@ -9,9 +9,8 @@ use App\Http\Controllers\GuiaController;
 use App\Http\Controllers\PaqueteController;
 use App\Http\Controllers\AlmacenController;
 use App\Http\Controllers\ServicioController;
-use App\Http\Controllers\VentasController;
 use App\Http\Controllers\RutaRastreoController;
-use App\Http\Controllers\PagosController;
+use App\Http\Controllers\PagosPageController;
 use App\Http\Controllers\CallBackAdminController;
 use App\Http\Controllers\ConsultarAdminController;
 use App\Http\Controllers\RutasController;
@@ -28,6 +27,7 @@ use App\Http\Controllers\RutasController;
 */
 Route::get('/', WelcomePageController::class)->name('/');
 //si es administrador
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -91,14 +91,6 @@ Route::middleware('auth')->group(function () {
          Route::delete('admin-rutarastreo/destroy/{rutarastreo_id}',  [RutaRastreoController::class, 'destroy'])->name('admin.rutarastreo.destroy');
 
 
-          //GESTIONAR VENTAS
-          Route::get('/admin-ventas',[VentasController::class, 'index'])->name('admin.ventas');
-          Route::get('/admin-ventas/create',[VentasController::class, 'create'])->name('admin.ventas.create');
-          Route::post('/admin-ventas/store',[VentasController::class, 'store'])->name('admin.ventas.store');
-          Route::get('/admin-ventas/edit/{venta_id}',[VentasController::class, 'edit'])->name('admin.ventas.edit');
-          Route::patch('/admin-ventas/update/{venta_id}', [VentasController::class, 'update'])->name('admin.ventas.update');
-          Route::delete('admin-ventas/destroy/{venta_id}',  [VentasController::class, 'destroy'])->name('admin.ventas.destroy');
-
             //GESTIONAR GRAFO
             Route::get('/admin-rutas',[RutasController::class, 'index'])->name('admin.rutas');
             Route::get('/admin-ruta/create',[RutasController::class, 'create'])->name('admin.ruta.create');
@@ -116,7 +108,7 @@ Route::middleware('auth')->group(function () {
 
             // PAGOS WEB
 
-            Route::post('/pagos/generarCobro', [PagosController::class, 'generarCobro'])->name('admin.pagos.generarCobro');
+            Route::post('/pagos/generarCobro', [PagosPageController::class, 'generarCobro'])->name('admin.pagos.generarCobro');
             Route::post('/pagos/callback', CallBackAdminController::class)->name('admin.pagos.callback');
             Route::get('/pagos/consultar/{venta_id}', ConsultarAdminController::class)->name('admin.pagos.consultar');
                     });

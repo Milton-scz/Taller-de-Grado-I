@@ -25,6 +25,7 @@ return new class extends Migration
             $table->date('fecha_llegada');
             $table->decimal('peso_total',8, 2);
             $table->decimal('precio_total',8, 2);
+            $table->string('codigo');
             $table->integer('estado')->default(0);
             $table->timestamps();
         });

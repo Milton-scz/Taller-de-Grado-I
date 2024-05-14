@@ -32,7 +32,7 @@
             </thead>
             <thead style="background-color: #dff1ff;">
                 <th style="text-align: center;">id</th>
-                <th style="text-align: center;">Cedula</th>
+                <th style="text-align: center;">Nombre del Cliente</th>
                 <th style="text-align: center;">ID de Paquete</th>
                 <th style="text-align: center;">Servicio</th>
                 <th style="text-align: center;">Almacen de Salida</th>
@@ -41,6 +41,7 @@
                 <th style="text-align: center;">Fecha de Llegad</th>
                 <th style="text-align: center;">Peso Total</th>
                 <th style="text-align: center;">Precio Total</th>
+                <th style="text-align: center;">Codigo de Rastreo</th>
                 <th style="text-align: center;">Estado</th>
                 <th style="text-align: center;">Acción</th>
             </thead>
@@ -48,20 +49,21 @@
 
                 <tr>
                         <td style="text-align: center;">{{$guia->id}}</td>
-                        <td style="text-align: center;">{{$guia->cliente_id}}</td>
+                        <td style="text-align: center;">{{$guia->user->name}}</td>
                         <td style="text-align: center;">{{$guia->paquete_id}}</td>
-                        <td style="text-align: center;">{{$guia->servicio_id}}</td>
-                        <td style="text-align: center;">{{$guia->almacen_salida}}</td>
-                        <td style="text-align: center;">{{$guia->almacen_llegada}}</td>
+                        <td style="text-align: center;">{{$guia->servicio->nombre}}</td>
+                        <td style="text-align: center;">{{$guia->almacenSalida->nombre}}</td>
+                        <td style="text-align: center;">{{$guia->almacenLlegada->nombre}}</td>
                         <td style="text-align: center;">{{$guia->fecha_salida}}</td>
                         <td style="text-align: center;">{{$guia->fecha_llegada}}</td>
                         <td style="text-align: center;">{{$guia->peso_total}}</td>
                         <td style="text-align: center;">{{$guia->precio_total}}</td>
+                        <td style="text-align: center;">{{$guia->codigo}}</td>
                         <td style="text-align: center;">{{$guia->estado}}</td>
                         <td style="text-align: center;">
                         <x-custom-button :url="'admin-guia/edit/'" :valor="$guia" >{{ __('Editar') }}</x-custom-button>
                         <x-danger-button x-data="" x-on:click.prevent="$dispatch('open-modal','{{$guia->id}}')">{{ __('Eliminar') }}</x-danger-button>
-                        <x-modal name='{{$almacen->id}}' :show="$errors->userDeletion->isNotEmpty()" focusable>
+                        <x-modal name='{{$guia->id}}' :show="$errors->userDeletion->isNotEmpty()" focusable>
                         <form method="POST" action="{{ route('admin.guia.destroy', ['guia_id' => $guia->id]) }}" class="p-6">
                        @csrf
                        @method('DELETE')

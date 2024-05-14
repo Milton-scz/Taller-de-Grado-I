@@ -9,4 +9,7 @@ class Servicio extends Model
 {
     use HasFactory;
     protected $guarded = [];
+    public function guias(){
+        return $this->hasMany(Guia::class);
+    }
 }
