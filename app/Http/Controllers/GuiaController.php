@@ -50,7 +50,7 @@ class GuiaController extends Controller
     public function store(Request $request) {
         $codigo = $this->generarCodigoUnico(20);
         try {
-        $nombre = $request->input('nombre'); // Ejemplo de cómo acceder a otro campo enviado desde JavaScript
+        $nombre = $request->input('nombre');
         $apellido = $request->input('apellido');
         $cedula = $request->input('cedula');
         $celular = $request->input('celular');
@@ -83,7 +83,6 @@ class GuiaController extends Controller
         $userUpdate->direccion = $direccion;
         $userUpdate->save();
 
-        // Crear un nuevo registro de Paquete con los datos recibidos
         $paquete = Paquete::create([
             'dimensiones' => $dimensiones,
             'peso' => $peso,
@@ -117,7 +116,7 @@ class GuiaController extends Controller
 
         return response()->json(['message' => 'Datos guardados correctamente'], 200);
     } catch (\Exception $e) {
-        // Registrar el error en los registros de Laravel
+
         \Log::error('Error al procesar la solicitud: ' . $e->getMessage());
 
         return response()->json(['error' => 'Error interno del servidor'], 500);

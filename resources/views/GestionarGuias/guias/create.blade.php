@@ -21,24 +21,25 @@
     <!-- /Navbar -->
 </div>
 
-<div class="mt-20 mx-auto max-w-6xl px-6 lg:py-20"> <!-- Cambia max-w-6xl por max-w-7xl si necesitas más ancho -->
+<div class="mt-20 mx-auto max-w-6xl px-6 lg:py-20">
     <div class="flex justify-center">
-        <div class="w-full lg:w-3/4 xl:w-2/3 text-center"> <!-- Ajusta el ancho en diferentes tamaños de pantalla -->
+        <div class="w-full lg:w-3/4 xl:w-2/3 text-center">
             <h3 class="text-3xl font-bold">Realiza el registro paso a paso</h3>
 
             <div class="mb-4">
                 <label for="file" class="block text-sm font-medium text-gray-700"></label>
                 <input type="file" id="fileInput" name="data[file]" class="mt-1 p-2 w-full border rounded-md">
             </div>
-            <div class="mb-4">
-            <button onclick="handleUpload()">Scan Document</button>
-            </div>
+
+            <div class="flex items-center justify-center mt-4">
+        <x-primary-button onclick="handleUpload()" class="ms-4">
+            {{ __('Escanear Documento') }}
+        </x-primary-button>
+    </div>
                         <!-- Barra de progreso -->
             <div class="mt-6 w-full bg-gray-200 h-6 rounded-lg overflow-hidden">
                 <div class="bg-blue-500 h-full transition-all duration-500" style="width: 33%;"></div>
             </div>
-            <!-- Mensaje adicional -->
-
             <!-- Formulario -->
             <div class="bg-white shadow-md rounded-md p-6 mt-4">
                 <form method="POST"  action="{{ route('admin.pagos.generarCobro') }}" >
@@ -51,21 +52,13 @@
                             <input type="text" id="name" name="dto_nombres" placeholder="Nombres"
                                 class="mt-1 p-2 w-full border rounded-md">
                         </div>
-                        <div class="mb-4">
-                            <label for="apellido" class="block text-sm font-medium text-gray-700">Apellidos</label>
-                            <input type="text" id="apellido" name="dto_apellidos" placeholder="Apellidos"
-                                class="mt-1 p-2 w-full border rounded-md">
-                        </div>
+
                         <div class="mb-4">
                             <label for="cedula" class="block text-sm font-medium text-gray-700">Cedula</label>
                             <input type="number" id="cedula" name="dto_cedula" placeholder="Cedula de identidad"
                                 class="mt-1 p-2 w-full border rounded-md">
                         </div>
-                        <div class="mb-4">
-                            <label for="fecha_nacimiento" class="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
-                            <input type="date" id="fecha_nacimiento" name="dto_fechaNacimiento" placeholder="Fecha de Nacimiento"
-                                class="mt-1 p-2 w-full border rounded-md">
-                        </div>
+
 
                         <div class="mb-4">
                             <label for="direccion" class="block text-sm font-medium text-gray-700">Direccion</label>
@@ -128,10 +121,7 @@
                             <label for="montoTotal" class="block text-sm font-medium text-gray-700">Monto Total a Pagar</label>
                             <input type="number" id="monto_total" name="monto_total"   class="mt-1 p-2 w-full border rounded-md">
                         </div>
-
-                <!-- primer vertice -->
-                                       <!-- Formulario de selección de vértices -->
-
+             <!-- Formulario de selección de vértices -->
                            <!-- primer vertice -->
                            <div class="mt-4">
                                             <x-input-label for="almacen_salida" :value="__('Almacen Salida')" />
@@ -157,12 +147,10 @@
                                     </div>
                               </div>
                      <!-- final degundo vertice -->
-                            <!-- Agrega este elemento ul donde mostrarás el resultado del camino más corto -->
                             <div class="mt-4">
                                 <x-input-label for="caminoMasCorto" :value="__('Camino más corto')" />
                                 <div class="mt-4">
                                     <ul id="listaCaminoMasCorto" class="list-disc pl-5">
-                                        <!-- Aquí se mostrarán los vértices del camino más corto como elementos de lista -->
                                     </ul>
                                 </div>
                             </div>
@@ -226,7 +214,7 @@ $(document).ready(function() {
 
             const listaCaminoMasCorto = $('#listaCaminoMasCorto');
             const valoresLista = listaCaminoMasCorto.find('li').map(function() {
-                return $(this).attr('value'); // Obtener el valor del atributo 'value' del elemento <li>
+                return $(this).attr('value');
             }).get();
 
             const datos = {
@@ -261,9 +249,8 @@ $(document).ready(function() {
                 success: function(response, status, xhr) {
                     console.log(xhr.status);
                     if (xhr.status === 200) {
-                        // Mostrar el modal
-                        $('#userModal').removeClass('hidden'); // Remover la clase 'hidden' para mostrar el modal
-                        $('#mensaje').text(response.message); // Mostrar el mensaje en el modal
+                        $('#userModal').removeClass('hidden');
+                        $('#mensaje').text(response.message);
                     }
                 },
                 error: function(xhr, status, error) {
@@ -279,23 +266,13 @@ $(document).ready(function() {
 </script>
 <script>
     function actualizarPrecio() {
-        // Obtener el valor seleccionado del campo de servicio
         const servicioSelect = document.getElementById('servicio_id');
         const selectedServiceOption = servicioSelect.options[servicioSelect.selectedIndex];
-
-        // Obtener el precio por kilo del servicio seleccionado desde el atributo data-atributo
         const precioKilo = parseFloat(selectedServiceOption.getAttribute('data-atributo'));
-
-        // Verificar si el precio por kilo es un número válido
         if (!isNaN(precioKilo)) {
-            // Obtener el valor del campo de peso
             const peso = parseFloat(document.getElementById('peso').value);
-
-            // Calcular el monto total
             const montoTotal = peso * precioKilo;
-
-            // Actualizar el valor del campo monto_total
-            document.getElementById('monto_total').value = montoTotal.toFixed(2); // Mostrar el resultado con 2 decimales
+            document.getElementById('monto_total').value = montoTotal.toFixed(2);
         } else {
             console.error('Precio por kilo no válido.');
         }
@@ -392,45 +369,36 @@ $(document).ready(function() {
             if (camino[0] === origen) {
                 return camino;
             } else {
-               return []; // No se encontró un camino desde el origen al destino
+               return [];
             }
         }
     }
 
-    // Obtener los vértices y arcos desde Laravel
     var vertices = @json($vertices);
     var arcos = @json($arcos);
 
-    // Crear una instancia del grafo
     const grafo = new Grafo();
 
-    // Agregar vértices al grafo
     vertices.forEach(vertice => {
-        grafo.agregarVertice(vertice.id); // Suponiendo que 'id' es el identificador del vértice
+        grafo.agregarVertice(vertice.id);
     });
 
-    // Agregar arcos al grafo
+
     arcos.forEach(arco => {
         grafo.agregarArco(arco.vertice_origen_id, arco.vertice_destino_id, arco.peso);
     });
 
-     // Función para actualizar la lista con el camino más corto
     function actualizarCaminoMasCorto(camino) {
         const listaCaminoMasCorto = document.getElementById('listaCaminoMasCorto');
-        listaCaminoMasCorto.innerHTML = ''; // Limpiar el contenido anterior
+        listaCaminoMasCorto.innerHTML = '';
 
         camino.forEach(verticeId => {
-            // Buscar el vértice con el ID correspondiente en el array de vértices
             const verticeEncontrado = vertices.find(vertice => vertice.id == verticeId);
 
-            // Verificar si se encontró el vértice
             if (verticeEncontrado) {
-                // Crear un elemento <li> con atributo value y texto personalizados
                 const li = document.createElement('li');
-                li.setAttribute('value', verticeEncontrado.id); // Establecer el atributo value
-                li.textContent = verticeEncontrado.nombre; // Establecer el contenido de texto
-
-                // Agregar el elemento <li> a la lista
+                li.setAttribute('value', verticeEncontrado.id);
+                li.textContent = verticeEncontrado.nombre;
                 listaCaminoMasCorto.appendChild(li);
             }else {
                 console.error(`No se encontró un vértice con ID ${verticeId}`);
@@ -438,34 +406,23 @@ $(document).ready(function() {
         });
     }
 
-    // Ejecutar Dijkstra al seleccionar el destino
     $('#verticeDestinoId').on('change', function() {
         var verticeOrigenId = $('#verticeOrigenId').val();
         var verticeDestinoId = $(this).val();
-
-        // Ejecutar Dijkstra con los nuevos vértices de origen y destino
         const caminoMasCorto = grafo.dijkstra(verticeOrigenId, verticeDestinoId);
         console.log('Camino más corto:', caminoMasCorto.join(' -> '));
         actualizarCaminoMasCorto(caminoMasCorto);
     });
-
-
-    // Ejecutar Dijkstra al cargar el DOM
     document.addEventListener('DOMContentLoaded', () => {
         console.log('Grafo creado:', grafo);
     });
 </script>
 
-
-
-
-
-
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         let current = 1;
         const steps = document.querySelectorAll("fieldset").length;
-        const progressBar = document.querySelector(".bg-blue-500"); // Selector del progressBar
+        const progressBar = document.querySelector(".bg-blue-500");
 
         document.querySelectorAll(".next").forEach(button => {
             button.addEventListener("click", () => {
@@ -494,20 +451,18 @@ $(document).ready(function() {
         });
 
         function setProgressBar(curStep) {
-            const percent = ((curStep - 1) / (steps - 1)) * 100; // Calcular el porcentaje
+            const percent = ((curStep - 1) / (steps - 1)) * 100;
             progressBar.style.width = percent + "%";
             progressBar.innerHTML = percent.toFixed(0) + "%";
 
-            console.log("Current Step: " + curStep); // Verificar el paso actual en la consola
-            console.log("Percent: " + percent); // Verificar el porcentaje actual en la consola
+            console.log("Current Step: " + curStep);
+            console.log("Percent: " + percent);
         }
 
-        setProgressBar(current); // Llama a setProgressBar al cargar la página con el 33%
+        setProgressBar(current);
     });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-    // upload.js
     async function uploadToApi(file) {
     const formData = new FormData();
     formData.append('file', file);
@@ -515,61 +470,55 @@ $(document).ready(function() {
     try {
         const response = await axios.post('https://api.ocr.space/parse/image', formData, {
             headers: {
-                'apiKey': 'helloworld', // Reemplaza con tu apiKey
+                'apiKey': 'helloworld',
                 'Content-Type': 'multipart/form-data'
             }
         });
 
         const responseBody = response.data;
         const responseBodyText = responseBody['ParsedResults'][0]['ParsedText'];
+       console.log('Texto extraído:', responseBodyText);
+       const notaEntregaJSON = convertirNotaEntregaATextoJSON(responseBodyText);
+            const notaEntrega = JSON.parse(notaEntregaJSON);
 
-        console.log('Texto extraído:', responseBodyText);
-
-        // Definir las claves y sus correspondientes palabras clave para buscar en el texto
-        const keysToFind = {
-            'nombres': 'NOMBRES',
-            'apellidos': 'APELLIDOS',
-            'fecha_nacimiento': 'FECHA DE NACIMIEWO',
-            'NO': 'NO'
-        };
-
-        // Objeto JSON para almacenar los resultados
-        const results = {};
-
-        // Recorrer cada clave y buscar su valor en el texto
-        for (const key in keysToFind) {
-            if (keysToFind.hasOwnProperty(key)) {
-                const keyword = keysToFind[key];
-                const startIndex = responseBodyText.indexOf(keyword);
-
-                if (startIndex !== -1) {
-                    const nextLineIndex = responseBodyText.indexOf('\n', startIndex);
-
-                    if (nextLineIndex !== -1) {
-                        let value = responseBodyText.substring(nextLineIndex + 1).trim();
-
-                        // Limpiar el valor según la clave
-                        if (key === 'fecha_nacimiento') {
-                            // Obtener solo la fecha de nacimiento sin caracteres adicionales
-                            value = value.replace(/[^\d\/]/g, '');
-                        }
-
-                        results[key] = value;
+            for (const key in notaEntrega) {
+                if (notaEntrega.hasOwnProperty(key)) {
+                    if(key==="Nombre del Cliente"){
+                        document.getElementById('name').value = notaEntrega[key];
+                    }else if(key==="DNI"){
+                        document.getElementById('cedula').value = notaEntrega[key];
                     }
+                    else if(key==="Direccion"){
+                        document.getElementById('direccion').value = notaEntrega[key];
+                    }
+                    else if(key==="Ciudad"){
+                        const value = notaEntrega[key];
+                     const element = document.getElementById('verticeDestinoId');
+                    if (element) {
+                        if (element.tagName === 'SELECT'  && key === "Ciudad") {
+                            for (let i = 0; i < element.options.length; i++) {
+                                if (element.options[i].text === value) {
+                                    element.selectedIndex = i;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    }
+                    else if(key==="Celular"){
+                        document.getElementById('celular').value = notaEntrega[key];
+                    }else if(key==="Correo"){
+                        document.getElementById('correo').value = notaEntrega[key];
+                    }else if(key==="Peso Total"){
+                        document.getElementById('peso').value = notaEntrega[key];
+                    }
+
                 }
             }
-        }
 
-        // Imprimir el objeto JSON con los resultados
-        console.log('Resultados:', results);
-
-        // Aquí puedes manejar el objeto JSON como desees, por ejemplo, mostrar en un textarea
-        const textarea = document.getElementById('name');
-        textarea.value = JSON.stringify(results, null, 2);
 
     } catch (error) {
         console.error('Error al enviar archivo a la API:', error);
-        // Maneja el error de la API según sea necesario
     }
 }
 
@@ -578,12 +527,117 @@ function handleUpload() {
     const file = fileInput.files[0];
 
     if (file) {
-        uploadToApi(file); // Llama a uploadToApi con el archivo seleccionado
+        uploadToApi(file);
     } else {
         console.error('No se ha seleccionado ningún archivo.');
     }
 }
+function convertirNotaEntregaATextoJSON(texto) {
+    const lineas = texto.split('\n');
 
+    let productos = [];
+    let cantidades = [];
+    let precios = [];
+    let descripciones = [];
+
+    const notaEntrega = {
+        "Nombre del Cliente": "",
+        "Direccion": "",
+        "Ciudad": "",
+        "Productos": [],
+        "Nro de Nota": "",
+        "DNI": "",
+        "Celular": "",
+        "Correo": "",
+        "Despachado por": "",
+        "Peso Total": "",
+        "Precio Total": "",
+        "Observaciones": "",
+    };
+
+    lineas.forEach((linea, index) => {
+        if (linea.startsWith("Nombre del Cliente:")) {
+            notaEntrega["Nombre del Cliente"] = obtenerValorDeLinea(linea);
+        } else if (linea.startsWith("Direccion:")) {
+            notaEntrega["Direccion"] = obtenerValorDeLinea(linea);
+        }else if (linea.startsWith("Celular:")) {
+            notaEntrega["Celular"] = obtenerValorDeLinea(linea);
+        }else if (linea.startsWith("E-mail:")) {
+            notaEntrega["Correo"] = obtenerValorDeLinea(linea);
+        }else if (linea.startsWith("Ciudad:")) {
+            notaEntrega["Ciudad"] = obtenerValorDeLinea(linea);
+        } else if (linea.startsWith("Nro de Nota:")) {
+            const siguienteLinea = lineas[index + 1];
+            if (siguienteLinea) {
+                notaEntrega["Nro de Nota"] = siguienteLinea.trim();
+            }
+        } else if (linea.startsWith("ONI:")) {
+            const siguienteLinea = lineas[index + 1];
+            if (siguienteLinea) {
+                notaEntrega["DNI"] = siguienteLinea.trim();
+            }
+        } else if (linea.startsWith("Despachado por:")) {
+            notaEntrega["Despachado por"] = obtenerValorDeLinea(linea);
+        } else if (linea.startsWith("Peso Total:")) {
+            const siguienteLinea = lineas[index + 1];
+            if (siguienteLinea) {
+                const pesoTotalConComa = siguienteLinea.trim();
+                const pesoTotalConPunto = pesoTotalConComa.replace(',', '.');
+                notaEntrega["Peso Total"] = pesoTotalConPunto;
+            }
+        } else if (linea.startsWith("Precio Total:")) {
+            notaEntrega["Precio Total"] = obtenerValorDeLinea(linea);
+        } else if (linea.startsWith("Observaciones:")) {
+            notaEntrega["Observaciones"] = obtenerValorDeLinea(linea);
+        } else if (linea.startsWith("Referencia")) {
+            const indiceReferencia = index + 1;
+            const indiceCantidad = lineas.findIndex(linea => linea.startsWith("Cantidad"));
+
+            if (indiceCantidad !== -1) {
+                productos = lineas.slice(indiceReferencia, indiceCantidad);
+            }
+        } else if (linea.startsWith("Cantidad")) {
+            const indiceReferencia = index + 1;
+            const indiceCantidad = lineas.findIndex(linea => linea.startsWith("Despachado por:"));
+            if (indiceCantidad !== -1) {
+                cantidades = lineas.slice(indiceReferencia, indiceCantidad);
+            }
+        } else if (linea.startsWith("Precio")) {
+            const indiceReferencia = index + 1;
+            const indiceCantidad = lineas.findIndex(linea => linea.startsWith("Peso Total:"));
+            if (indiceCantidad !== -1) {
+                precios = lineas.slice(indiceReferencia, indiceCantidad);
+            }
+        } else if (linea.startsWith("Descripcion del Articulo")) {
+            const indiceReferencia = index + 1;
+            const indiceCantidad = lineas.findIndex(linea => linea.startsWith("Precio Total:"));
+            if (indiceCantidad !== -1) {
+                descripciones = lineas.slice(indiceReferencia, indiceCantidad);
+            }
+        }
+    });
+
+    productos.forEach((producto, i) => {
+        const nombreProducto = producto.trim();
+        const cantidad = cantidades[i] ? parseInt(cantidades[i].trim()) : 0;
+        const precio = precios[i] ? parseFloat(precios[i].trim()) : 0;
+        const descripcion = descripciones[i] ? descripciones[i].trim() : "";
+
+        notaEntrega["Productos"].push({
+            "Nombre": nombreProducto,
+            "Cantidad": cantidad,
+            "Precio": precio,
+            "Descripcion": descripcion
+        });
+    });
+
+    function obtenerValorDeLinea(linea) {
+        const partes = linea.split(":");
+        return partes.length > 1 ? partes[1].trim() : "";
+    }
+    console.log('Nota de entrega en formato JSON:', notaEntrega);
+    return JSON.stringify(notaEntrega, null, 4);
+}
 
 </script>
 </body>
