@@ -12,6 +12,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('layouts.whatsapp')
 </head>
 <body class="bg-gray-100">
 
@@ -249,6 +250,8 @@ $(document).ready(function() {
                 success: function(response, status, xhr) {
                     console.log(xhr.status);
                     if (xhr.status === 200) {
+                        const mensaje = "Su pedido fue registrado exitosamente :) , Puede realizar el seguimiendo de su pedido en nuestra aplicacion movil.";
+                        EnviarWhatsApp(celular,mensaje);
                         $('#userModal').removeClass('hidden');
                         $('#mensaje').text(response.message);
                     }

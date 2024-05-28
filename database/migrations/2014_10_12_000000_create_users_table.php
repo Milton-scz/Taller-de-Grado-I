@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('cedula')->default('');
             $table->string('celular')->default('');
             $table->string('direccion')->default('');
-            $table->string('email')->unique();
+            $table->string('email');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('is_admin')->default(0);

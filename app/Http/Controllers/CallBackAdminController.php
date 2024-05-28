@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Models\Guia;
+use App\Models\Ruta_Rastreo;
 use App\Models\Venta;
 use App\Models\Pago;
 use App\Models\DetalleVenta;
@@ -34,6 +35,25 @@ class CallBackAdminController extends Controller{
         $venta->update();
 
 
+        $detalleVenta = DetalleVenta::where('venta_id', $venta->id)->first(['guia_id']);
+        $guia = Guia::findOrFail($detalleVenta->guia_id);
+        $guia->estado = 1;
+        $guia->update();
+
+        $detalleVenta2 = DetalleVenta::where('venta_id', $venta->id)->first(['guia_id']);
+        if ($detalleVenta2) {
+            $guia = Guia::findOrFail($detalleVenta2->guia_id);
+            if ($guia) {
+                $ruta_rastreo = Ruta_Rastreo::where('guia_id', $guia->id)
+                                            ->where('almacen_id', $guia->almacen_llegada)
+                                            ->first();
+                if ($ruta_rastreo) {
+                    $ruta_rastreo->estado = 1;
+                    $ruta_rastreo->save();
+                }
+            }
+        }
+
 
         try {
             $arreglo = ['error' => 0, 'status' => 1, 'message' => "Pago realizado correctamente.", 'values' => true];
@@ -46,3 +66,4 @@ class CallBackAdminController extends Controller{
 
 
 }
+

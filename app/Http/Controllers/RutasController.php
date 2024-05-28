@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ruta;
+use App\Models\Ruta_Rastreo;
 use App\Models\Arco;
 use App\Models\Vertice;
 use App\Models\Almacen;
@@ -108,6 +109,11 @@ class RutasController extends Controller
          'arcos' => $arcos,
      ], 200);
  }
+// CHECK-IN SHOW
+ public function checkInShow(){
+    $almacenes =Almacen::paginate(20);
+   return view('GestionarRutas.checkin.show',compact('almacenes'));
+}
 
 
 

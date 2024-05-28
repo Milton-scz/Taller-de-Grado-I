@@ -61,6 +61,7 @@
                         <td style="text-align: center;">{{$guia->codigo}}</td>
                         <td style="text-align: center;">{{$guia->estado}}</td>
                         <td style="text-align: center;">
+                        <x-custom-button :url="'admin-guia/show/'" :valor="$guia" target="_blank">{{ __('Show') }}</x-custom-button>
                         <x-custom-button :url="'admin-guia/edit/'" :valor="$guia" >{{ __('Editar') }}</x-custom-button>
                         <x-danger-button x-data="" x-on:click.prevent="$dispatch('open-modal','{{$guia->id}}')">{{ __('Eliminar') }}</x-danger-button>
                         <x-modal name='{{$guia->id}}' :show="$errors->userDeletion->isNotEmpty()" focusable>
@@ -95,7 +96,9 @@
          </table>
         </div>
         </div>
-
+        <div class="my-4">
+           {{$guias->links()}}
+        </div>
                             </div>
                         </div>
                 </section>

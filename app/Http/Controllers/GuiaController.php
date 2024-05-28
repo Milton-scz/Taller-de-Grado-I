@@ -11,14 +11,16 @@ use App\Models\Venta;
 use App\Models\Vertice;
 use App\Models\Ruta;
 use App\Models\Arco;
+use GuzzleHttp\Client;
 use App\Models\Ruta_Rastreo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 class GuiaController extends Controller
 {
     public function index(){
-        $guias  =Guia::paginate(20);
+        $guias  =Guia::paginate(10);
        return view('GestionarGuias.guias.index',compact('guias'));
     }
 
@@ -67,6 +69,9 @@ class GuiaController extends Controller
         $monto_total = $request->input('monto_total');
         $valoresLista = $request->input('valoresLista');
 
+        $userFind = User::where('cedula', $cedula)->first();
+
+        if(!$userFind){
         $user = User::create([
             'name' => $nombre,
             'cedula' => $cedula,
@@ -114,6 +119,64 @@ class GuiaController extends Controller
             ]);
         }
 
+        $rutaRastreo2 = Ruta_Rastreo::where('guia_id', $guiaId)
+        ->where('almacen_id', $verticeOrigeniId)
+        ->orderBy('id', 'desc')
+        ->first();
+
+        $existeRuta = $rutaRastreo2->id;
+        $ruta_rastreo = Ruta_Rastreo::find($existeRuta );
+            $ruta_rastreo->estado = 1;
+            $ruta_rastreo->save();
+
+    }else{
+        $userUpdate = User::findOrFail($userFind->id);
+        $userUpdate->cedula = $cedula;
+        $userUpdate->celular = $celular;
+        $userUpdate->direccion = $direccion;
+        $userUpdate->save();
+
+        $paquete = Paquete::create([
+            'dimensiones' => $dimensiones,
+            'peso' => $peso,
+        ]);
+
+        $userId = $userFind->id;
+        $paqueteId = $paquete->id;
+        $guia = Guia::create([
+            'user_id' => $userId,
+            'paquete_id' => $paqueteId,
+            'servicio_id' => $servicio_id,
+            'almacen_salida' => $verticeOrigeniId,
+            'almacen_llegada' => $verticeDestinoiId,
+            'fecha_salida' => $fecha_salida,
+            'fecha_llegada' => $fecha_llegada,
+            'peso_total' => $peso,
+            'precio_total' => $monto_total,
+            'codigo' => $codigo,
+            'estado' => 0,
+        ]);
+
+        $guiaId = $guia->id;
+        foreach ($valoresLista as $valores) {
+            $rutaRastreo = Ruta_Rastreo::create([
+                'guia_id' => $guiaId,
+                'almacen_id' => $valores,
+                'fecha_registro' => now(),
+                'estado' => 0 ,
+            ]);
+        }
+
+        $rutaRastreo2 = Ruta_Rastreo::where('guia_id', $guiaId)
+        ->where('almacen_id', $verticeOrigeniId)
+        ->orderBy('id', 'desc')
+        ->first();
+
+        $existeRuta = $rutaRastreo2->id;
+        $ruta_rastreo = Ruta_Rastreo::find($existeRuta );
+            $ruta_rastreo->estado = 1;
+            $ruta_rastreo->save();
+    }
         return response()->json(['message' => 'Datos guardados correctamente'], 200);
     } catch (\Exception $e) {
 
@@ -133,6 +196,11 @@ class GuiaController extends Controller
     public function edit($paquete_id){
         $paquete = Paquete::findOrFail($paquete_id);
         return view('GestionarPaquetes.paquetes.edit')->with("paquete", $paquete);
+    }
+
+    public function show($guia_id){
+        $guia = Guia::findOrFail($guia_id);
+        return view('GestionarGuias.guias.show')->with("guia", $guia);
     }
 
     public function destroy($paquete_id){

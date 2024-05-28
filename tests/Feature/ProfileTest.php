@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Paquete;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -96,4 +97,6 @@ class ProfileTest extends TestCase
 
         $this->assertNotNull($user->fresh());
     }
+
+
 }
